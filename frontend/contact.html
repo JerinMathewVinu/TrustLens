@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Contact — TrustLens</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    :root{--acid:#b8ff3c;--plasma:#ff3cac;--cyan:#3cffd8;--void:#03000a;--border:rgba(184,255,60,0.12);--text:#e8e8f0;--muted:#6b6b80;}
+    *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+    body{background:var(--void);color:var(--text);font-family:'DM Sans',sans-serif;min-height:100vh;overflow-x:hidden;cursor:none;}
+    .cursor{position:fixed;width:8px;height:8px;background:var(--acid);border-radius:50%;pointer-events:none;z-index:9999;transition:transform 0.1s;transform:translate(-50%,-50%);}
+    .cursor-ring{position:fixed;width:32px;height:32px;border:1px solid rgba(184,255,60,0.5);border-radius:50%;pointer-events:none;z-index:9998;transition:all 0.15s ease;transform:translate(-50%,-50%);}
+    .grid-bg{position:fixed;inset:0;z-index:0;pointer-events:none;background-image:linear-gradient(rgba(184,255,60,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(184,255,60,0.03) 1px,transparent 1px);background-size:60px 60px;}
+    .orb{position:fixed;border-radius:50%;filter:blur(140px);pointer-events:none;z-index:0;animation:drift 22s ease-in-out infinite;}
+    .orb-1{width:500px;height:500px;background:rgba(60,255,216,0.05);top:-150px;right:-150px;}
+    .orb-2{width:400px;height:400px;background:rgba(184,255,60,0.04);bottom:-100px;left:-100px;animation-delay:-11s;}
+    @keyframes drift{0%,100%{transform:translate(0,0);}50%{transform:translate(20px,-15px);}}
+
+    nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:0 60px;height:72px;background:rgba(3,0,10,0.75);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);}
+    .nav-logo{font-family:'Syne',sans-serif;font-weight:800;font-size:1.4rem;color:var(--acid);text-decoration:none;display:flex;align-items:center;gap:10px;}
+    .nav-logo::before{content:'';width:10px;height:10px;background:var(--acid);border-radius:50%;box-shadow:0 0 20px rgba(184,255,60,0.7);display:block;animation:pulse 2s infinite;}
+    @keyframes pulse{0%,100%{transform:scale(1);}50%{transform:scale(1.5);opacity:0.6;}}
+    .nav-links{list-style:none;display:flex;gap:8px;}
+    .nav-links a{font-family:'Space Mono',monospace;font-size:0.75rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--muted);text-decoration:none;padding:8px 16px;border-radius:4px;transition:all 0.2s;}
+    .nav-links a:hover,.nav-links a.active{color:var(--acid);background:rgba(184,255,60,0.08);}
+
+    .main{min-height:100vh;padding:100px 60px 80px;position:relative;z-index:1;max-width:1100px;margin:auto;display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:start;padding-top:120px;}
+
+    /* LEFT */
+    .contact-info{padding-top:20px;}
+    .ci-tag{font-family:'Space Mono',monospace;font-size:0.7rem;color:var(--muted);letter-spacing:0.12em;text-transform:uppercase;margin-bottom:14px;}
+    .ci-title{font-family:'Syne',sans-serif;font-weight:800;font-size:3rem;color:#fff;line-height:1.1;margin-bottom:20px;}
+    .ci-title span{color:var(--acid);}
+    .ci-desc{color:var(--muted);font-size:0.95rem;line-height:1.9;margin-bottom:40px;}
+    .ci-items{display:flex;flex-direction:column;gap:16px;}
+    .ci-item{display:flex;align-items:center;gap:16px;padding:18px 20px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.04);border-radius:4px;transition:all 0.2s;}
+    .ci-item:hover{border-color:rgba(184,255,60,0.12);background:rgba(184,255,60,0.03);}
+    .ci-item-icon{font-size:1.2rem;}
+    .ci-item-text{font-family:'Space Mono',monospace;font-size:0.78rem;color:#c0c8d8;}
+
+    /* FORM */
+    .contact-form{background:rgba(8,5,16,0.9);border:1px solid var(--border);border-radius:4px;overflow:hidden;box-shadow:0 0 60px rgba(184,255,60,0.05);position:relative;}
+    .contact-form::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--acid),transparent);}
+    .form-header{padding:20px 28px;border-bottom:1px solid var(--border);background:rgba(184,255,60,0.03);}
+    .fh-title{font-family:'Space Mono',monospace;font-size:0.72rem;color:var(--acid);text-transform:uppercase;letter-spacing:0.1em;}
+    .form-body{padding:32px;}
+    .field{margin-bottom:22px;}
+    .field label{display:block;font-family:'Space Mono',monospace;font-size:0.68rem;color:var(--acid);opacity:0.8;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:10px;}
+    .field input,.field textarea{width:100%;padding:14px 16px;background:rgba(0,0,0,0.4);border:1px solid rgba(184,255,60,0.12);border-radius:4px;color:#e0e8ff;font-family:'Space Mono',monospace;font-size:0.85rem;outline:none;transition:all 0.25s;}
+    .field textarea{resize:vertical;min-height:120px;line-height:1.7;}
+    .field input::placeholder,.field textarea::placeholder{color:rgba(184,255,60,0.2);}
+    .field input:focus,.field textarea:focus{border-color:rgba(184,255,60,0.4);box-shadow:0 0 20px rgba(184,255,60,0.07);}
+    .btn-send{width:100%;padding:16px;font-family:'Syne',sans-serif;font-weight:700;font-size:0.95rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--void);background:var(--acid);border:none;border-radius:4px;cursor:pointer;transition:all 0.25s;position:relative;overflow:hidden;}
+    .btn-send::before{content:'';position:absolute;top:0;left:-100%;width:100%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.3),transparent);transition:left 0.5s;}
+    .btn-send:hover{box-shadow:0 0 30px rgba(184,255,60,0.4);transform:translateY(-1px);}
+    .btn-send:hover::before{left:100%;}
+
+    footer{padding:40px 60px;border-top:1px solid var(--border);position:relative;z-index:1;display:flex;align-items:center;justify-content:space-between;}
+    .footer-logo{font-family:'Syne',sans-serif;font-weight:800;font-size:1.1rem;color:var(--acid);}
+    .footer-text{font-family:'Space Mono',monospace;font-size:0.7rem;color:var(--muted);}
+
+    @media(max-width:900px){nav{padding:0 20px;}.main{grid-template-columns:1fr;gap:48px;padding:90px 20px 40px;}.ci-title{font-size:2.2rem;}.nav-links a{font-size:0.65rem;padding:6px 8px;}footer{flex-direction:column;gap:10px;text-align:center;padding:24px;}}
+  </style>
+</head>
+<body>
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+<div class="grid-bg"></div>
+<div class="orb orb-1"></div>
+<div class="orb orb-2"></div>
+
+<header>
+  <nav>
+    <a href="index.html" class="nav-logo">TrustLens</a>
+    <ul class="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="about.html">About</a></li>
+      <li><a href="contact.html" class="active">Contact</a></li>
+      <li><a href="login.html">Login</a></li>
+      <li><a href="register.html">Register</a></li>
+    </ul>
+  </nav>
+</header>
+
+<main class="main">
+  <div class="contact-info">
+    <div class="ci-tag">// Secure Channel</div>
+    <h1 class="ci-title">Get In <span>Touch</span></h1>
+    <p class="ci-desc">Reach out to the TrustLens team for feedback, suggestions, or project-related queries. We're always monitoring.</p>
+    <div class="ci-items">
+      <div class="ci-item"><span class="ci-item-icon"></span><span class="ci-item-text">Transmission typically acknowledged within 24h</span></div>
+      <div class="ci-item"><span class="ci-item-icon"></span><span class="ci-item-text">All transmissions encrypted end-to-end</span></div>
+      <div class="ci-item"><span class="ci-item-icon"></span><span class="ci-item-text">Neural systems online 24/7</span></div>
+    </div>
+  </div>
+
+  <div class="contact-form">
+    <div class="form-header">
+      <div class="fh-title">// Secure Transmission — contact_form.sh</div>
+    </div>
+    <div class="form-body">
+      <form onsubmit="submitContactForm(event); return false;">
+        <div class="field">
+          <label>&gt; Identifier (Name)</label>
+          <input type="text" id="contactName" placeholder="Enter your full name" required>
+        </div>
+        <div class="field">
+          <label>&gt; Comm Link (Email)</label>
+          <input type="email" id="contactEmail" placeholder="Enter your email address" required>
+        </div>
+        <div class="field">
+          <label>&gt; Payload (Message)</label>
+          <textarea id="contactMessage" placeholder="Enter your message..." required></textarea>
+        </div>
+        <button type="submit" class="btn-send">Transmit Message →</button>
+      </form>
+    </div>
+  </div>
+</main>
+
+<footer>
+  <div class="footer-logo">TrustLens</div>
+  <div class="footer-text">© 2026 TrustLens — Neural Review Intelligence</div>
+</footer>
+
+<script src="js/script.js"></script>
+<script src="js/theme.js"></script>
+<script>
+  const cursor=document.getElementById('cursor'),ring=document.getElementById('cursorRing');
+  document.addEventListener('mousemove',e=>{cursor.style.left=e.clientX+'px';cursor.style.top=e.clientY+'px';ring.style.left=e.clientX+'px';ring.style.top=e.clientY+'px';});
+  document.querySelectorAll('a,button,input,textarea').forEach(el=>{el.addEventListener('mouseenter',()=>{ring.style.transform='translate(-50%,-50%) scale(1.8)';});el.addEventListener('mouseleave',()=>{ring.style.transform='translate(-50%,-50%) scale(1)';});});
+</script>
+</body>
+</html>

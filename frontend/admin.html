@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin — TrustLens</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    :root{--acid:#b8ff3c;--plasma:#ff3cac;--cyan:#3cffd8;--orange:#ff9f3c;--void:#03000a;--border:rgba(184,255,60,0.1);--text:#e8e8f0;--muted:#6b6b80;}
+    *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+    body{background:var(--void);color:var(--text);font-family:'DM Sans',sans-serif;min-height:100vh;overflow-x:hidden;cursor:none;}
+    .cursor{position:fixed;width:8px;height:8px;background:var(--plasma);border-radius:50%;pointer-events:none;z-index:9999;transition:transform 0.1s;transform:translate(-50%,-50%);}
+    .cursor-ring{position:fixed;width:32px;height:32px;border:1px solid rgba(255,60,172,0.5);border-radius:50%;pointer-events:none;z-index:9998;transition:all 0.15s ease;transform:translate(-50%,-50%);}
+    .grid-bg{position:fixed;inset:0;z-index:0;pointer-events:none;background-image:linear-gradient(rgba(255,60,172,0.02) 1px,transparent 1px),linear-gradient(90deg,rgba(255,60,172,0.02) 1px,transparent 1px);background-size:60px 60px;}
+    .orb{position:fixed;border-radius:50%;filter:blur(140px);pointer-events:none;z-index:0;animation:drift 22s ease-in-out infinite;}
+    .orb-1{width:600px;height:600px;background:rgba(255,60,172,0.05);top:-200px;left:-150px;}
+    .orb-2{width:500px;height:500px;background:rgba(255,159,60,0.04);bottom:-200px;right:-100px;animation-delay:-11s;}
+    @keyframes drift{0%,100%{transform:translate(0,0);}50%{transform:translate(20px,-15px);}}
+    nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:0 60px;height:72px;background:rgba(3,0,10,0.75);backdrop-filter:blur(20px);border-bottom:1px solid rgba(255,60,172,0.15);}
+    .nav-logo{font-family:'Syne',sans-serif;font-weight:800;font-size:1.4rem;color:var(--plasma);text-decoration:none;display:flex;align-items:center;gap:10px;}
+    .nav-logo::before{content:'';width:10px;height:10px;background:var(--plasma);border-radius:50%;box-shadow:0 0 20px rgba(255,60,172,0.7);display:block;animation:pulse 2s infinite;}
+    @keyframes pulse{0%,100%{transform:scale(1);}50%{transform:scale(1.5);opacity:0.6;}}
+    .nav-links{list-style:none;display:flex;gap:8px;}
+    .nav-links a{font-family:'Space Mono',monospace;font-size:0.75rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--muted);text-decoration:none;padding:8px 16px;border-radius:4px;transition:all 0.2s;}
+    .nav-links a:hover,.nav-links a.active{color:var(--plasma);background:rgba(255,60,172,0.08);}
+    .main{padding:100px 60px 60px;position:relative;z-index:1;max-width:1400px;margin:auto;}
+    .admin-header{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:48px;padding-bottom:28px;border-bottom:1px solid rgba(255,60,172,0.1);}
+    .ah-tag{font-family:'Space Mono',monospace;font-size:0.7rem;color:rgba(255,60,172,0.6);letter-spacing:0.12em;text-transform:uppercase;margin-bottom:10px;}
+    .ah-title{font-family:'Syne',sans-serif;font-weight:800;font-size:2.4rem;color:#fff;}
+    .ah-title span{color:var(--plasma);}
+    .admin-badge{display:flex;align-items:center;gap:8px;font-family:'Space Mono',monospace;font-size:0.72rem;color:rgba(255,60,172,0.8);background:rgba(255,60,172,0.08);border:1px solid rgba(255,60,172,0.2);padding:8px 16px;border-radius:2px;}
+    .badge-dot{width:6px;height:6px;background:var(--plasma);border-radius:50%;box-shadow:0 0 8px var(--plasma);animation:pulse 2s infinite;}
+    .section-label{font-family:'Space Mono',monospace;font-size:0.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.12em;margin-bottom:20px;display:flex;align-items:center;gap:10px;}
+    .section-label::before{content:'';height:1px;width:30px;background:var(--plasma);opacity:0.5;}
+    .metrics-row{display:grid;grid-template-columns:repeat(4,1fr);gap:2px;margin-bottom:48px;}
+    .metric{padding:36px 32px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.04);position:relative;overflow:hidden;transition:all 0.3s;}
+    .metric:hover{background:rgba(255,60,172,0.04);border-color:rgba(255,60,172,0.15);}
+    .metric::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;background:var(--plasma);transform:scaleX(0);transform-origin:left;transition:transform 0.4s;}
+    .metric:hover::after{transform:scaleX(1);}
+    .metric-label{font-family:'Space Mono',monospace;font-size:0.68rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.12em;margin-bottom:16px;}
+    .metric-val{font-family:'Syne',sans-serif;font-weight:800;font-size:3rem;color:var(--plasma);text-shadow:0 0 20px rgba(255,60,172,0.3);}
+    .metric:nth-child(2) .metric-val{color:var(--acid);text-shadow:0 0 20px rgba(184,255,60,0.3);}
+    .metric:nth-child(3) .metric-val{color:var(--cyan);text-shadow:0 0 20px rgba(60,255,216,0.3);}
+    .table-section{margin-bottom:48px;}
+    .table-wrap{background:rgba(8,5,16,0.9);border:1px solid rgba(255,60,172,0.1);border-radius:4px;overflow:hidden;}
+    .table-wrap.tw-orange{border-color:rgba(255,159,60,0.1);}
+    .tw-header{padding:18px 24px;background:rgba(255,60,172,0.04);border-bottom:1px solid rgba(255,60,172,0.1);display:flex;align-items:center;gap:8px;}
+    .tw-orange .tw-header{background:rgba(255,159,60,0.03);border-bottom-color:rgba(255,159,60,0.1);}
+    .tw-title{font-family:'Space Mono',monospace;font-size:0.72rem;color:rgba(255,60,172,0.7);text-transform:uppercase;letter-spacing:0.1em;}
+    .tw-orange .tw-title{color:rgba(255,159,60,0.8);}
+    .tw-count{font-family:'Space Mono',monospace;font-size:0.68rem;color:var(--muted);margin-left:auto;}
+    table{width:100%;border-collapse:collapse;}
+    thead tr{border-bottom:1px solid rgba(255,255,255,0.04);}
+    th{font-family:'Space Mono',monospace;font-size:0.65rem;color:rgba(255,60,172,0.6);text-transform:uppercase;letter-spacing:0.1em;padding:16px 24px;text-align:left;font-weight:400;}
+    .tw-orange th{color:rgba(255,159,60,0.7);}
+    td{font-family:'Space Mono',monospace;font-size:0.78rem;color:#c0c8d8;padding:16px 24px;border-bottom:1px solid rgba(255,255,255,0.03);transition:background 0.2s;}
+    tbody tr:hover td{background:rgba(255,60,172,0.03);}
+    .tw-orange tbody tr:hover td{background:rgba(255,159,60,0.03);}
+    tbody tr:last-child td{border-bottom:none;}
+    footer{padding:40px 60px;border-top:1px solid var(--border);position:relative;z-index:1;display:flex;align-items:center;justify-content:space-between;}
+    .footer-logo{font-family:'Syne',sans-serif;font-weight:800;font-size:1.1rem;color:var(--plasma);}
+    .footer-text{font-family:'Space Mono',monospace;font-size:0.7rem;color:var(--muted);}
+    @media(max-width:900px){nav{padding:0 20px;}.main{padding:90px 20px 40px;}.metrics-row{grid-template-columns:1fr 1fr;}.admin-header{flex-direction:column;align-items:flex-start;gap:16px;}.nav-links a{font-size:0.65rem;padding:6px 8px;}footer{flex-direction:column;gap:10px;text-align:center;padding:24px;}.table-wrap{overflow-x:auto;}}
+  </style>
+</head>
+<body onload="checkAdminAccess(); loadAdminData();">
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+<div class="grid-bg"></div>
+<div class="orb orb-1"></div>
+<div class="orb orb-2"></div>
+
+<header>
+  <nav>
+    <a href="admin.html" class="nav-logo">TrustLens Admin</a>
+    <ul class="nav-links">
+      <li><a href="admin.html" class="active">Admin</a></li>
+      <li><a href="login.html" onclick="logoutUser()">Logout</a></li>
+    </ul>
+  </nav>
+</header>
+
+<main class="main">
+  <div class="admin-header">
+    <div>
+      <div class="ah-tag">// Elevated Access</div>
+      <h1 class="ah-title"><span>Admin</span> Control Panel</h1>
+    </div>
+    <div class="admin-badge"><span class="badge-dot"></span>Root Access Granted</div>
+  </div>
+
+  <div class="section-label">System Metrics</div>
+  <div class="metrics-row">
+    <div class="metric"><div class="metric-label">Total Users</div><div class="metric-val" id="totalUsers">0</div></div>
+    <div class="metric"><div class="metric-label">Sentiment Reviews</div><div class="metric-val" id="totalReviews">0</div></div>
+    <div class="metric"><div class="metric-label">Fake News Checked</div><div class="metric-val" id="totalFakeNews">0</div></div>
+    <div class="metric"><div class="metric-label">Contact Messages</div><div class="metric-val" id="totalContacts">0</div></div>
+  </div>
+
+  <div class="table-section">
+    <div class="section-label">Registered Users</div>
+    <div class="table-wrap">
+      <div class="tw-header">
+        <span>👤</span><span class="tw-title">// users.table</span><span class="tw-count">Live data</span>
+      </div>
+      <table>
+        <thead><tr><th>ID</th><th>Name</th><th>Email</th></tr></thead>
+        <tbody id="usersTable"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="table-section">
+    <div class="section-label">Sentiment Analysis</div>
+    <div class="table-wrap">
+      <div class="tw-header">
+        <span></span><span class="tw-title">// sentiment_analysis.table</span><span class="tw-count">Live data</span>
+      </div>
+      <table>
+        <thead><tr><th>Review</th><th>Sentiment</th><th>Trust</th><th>Misleading</th></tr></thead>
+        <tbody id="sentimentTable"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="table-section">
+    <div class="section-label">Fake News Detection</div>
+    <div class="table-wrap tw-orange">
+      <div class="tw-header">
+        <span></span><span class="tw-title">// fake_news_detection.table</span><span class="tw-count">Live data</span>
+      </div>
+      <table>
+        <thead><tr><th>News</th><th>Prediction</th><th>Trust</th><th>Misleading</th></tr></thead>
+        <tbody id="fakeNewsTable"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="table-section">
+    <div class="section-label">Contact Messages</div>
+    <div class="table-wrap">
+      <div class="tw-header">
+        <span></span><span class="tw-title">// contact_messages.table</span><span class="tw-count">Live data</span>
+      </div>
+      <table>
+        <thead><tr><th>Name</th><th>Email</th><th>Message</th></tr></thead>
+        <tbody id="contactsTable"></tbody>
+      </table>
+    </div>
+  </div>
+</main>
+
+<footer>
+  <div class="footer-logo">TrustLens Admin</div>
+  <div class="footer-text">© 2026 TrustLens — Admin Panel</div>
+</footer>
+
+<script src="js/script.js"></script>
+<script src="js/theme.js"></script>
+<script>
+  const cursor=document.getElementById('cursor'),ring=document.getElementById('cursorRing');
+  document.addEventListener('mousemove',e=>{cursor.style.left=e.clientX+'px';cursor.style.top=e.clientY+'px';ring.style.left=e.clientX+'px';ring.style.top=e.clientY+'px';});
+  document.querySelectorAll('a,button').forEach(el=>{
+    el.addEventListener('mouseenter',()=>{ring.style.transform='translate(-50%,-50%) scale(1.8)';ring.style.borderColor='rgba(255,60,172,0.8)';});
+    el.addEventListener('mouseleave',()=>{ring.style.transform='translate(-50%,-50%) scale(1)';ring.style.borderColor='rgba(255,60,172,0.5)';});
+  });
+</script>
+</body>
+</html>

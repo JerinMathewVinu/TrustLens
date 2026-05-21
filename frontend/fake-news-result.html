@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Fake News Result — TrustLens</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    :root{--acid:#b8ff3c;--plasma:#ff3cac;--cyan:#3cffd8;--orange:#ff9f3c;--void:#03000a;--border:rgba(255,159,60,0.12);--text:#e8e8f0;--muted:#6b6b80;}
+    *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+    body{background:var(--void);color:var(--text);font-family:'DM Sans',sans-serif;min-height:100vh;overflow-x:hidden;cursor:none;}
+    .cursor{position:fixed;width:8px;height:8px;background:var(--orange);border-radius:50%;pointer-events:none;z-index:9999;transition:transform 0.1s;transform:translate(-50%,-50%);}
+    .cursor-ring{position:fixed;width:32px;height:32px;border:1px solid rgba(255,159,60,0.5);border-radius:50%;pointer-events:none;z-index:9998;transition:all 0.15s ease;transform:translate(-50%,-50%);}
+    body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");opacity:0.35;}
+    .grid-bg{position:fixed;inset:0;z-index:0;pointer-events:none;background-image:linear-gradient(rgba(255,159,60,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(255,159,60,0.03) 1px,transparent 1px);background-size:60px 60px;}
+    .orb{position:fixed;border-radius:50%;filter:blur(140px);pointer-events:none;z-index:0;animation:drift 22s ease-in-out infinite;}
+    .orb-1{width:600px;height:600px;background:rgba(255,159,60,0.05);top:-200px;right:-100px;}
+    .orb-2{width:500px;height:500px;background:rgba(255,60,172,0.04);bottom:-200px;left:-100px;animation-delay:-11s;}
+    @keyframes drift{0%,100%{transform:translate(0,0);}50%{transform:translate(20px,-15px);}}
+
+    nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:0 60px;height:72px;background:rgba(3,0,10,0.75);backdrop-filter:blur(20px);border-bottom:1px solid rgba(184,255,60,0.1);}
+    .nav-logo{font-family:'Syne',sans-serif;font-weight:800;font-size:1.4rem;color:var(--acid);text-decoration:none;display:flex;align-items:center;gap:10px;}
+    .nav-logo::before{content:'';width:10px;height:10px;background:var(--acid);border-radius:50%;box-shadow:0 0 20px rgba(184,255,60,0.7);display:block;animation:pulse 2s infinite;}
+    @keyframes pulse{0%,100%{transform:scale(1);}50%{transform:scale(1.5);opacity:0.6;}}
+    .nav-links{list-style:none;display:flex;gap:8px;}
+    .nav-links a{font-family:'Space Mono',monospace;font-size:0.75rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--muted);text-decoration:none;padding:8px 16px;border-radius:4px;transition:all 0.2s;}
+    .nav-links a:hover,.nav-links a.active{color:var(--acid);background:rgba(184,255,60,0.08);}
+
+    .main{padding:100px 60px 60px;position:relative;z-index:1;max-width:1100px;margin:auto;}
+
+    .report-header{margin-bottom:40px;animation:reveal 0.5s ease both;}
+    @keyframes reveal{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:translateY(0);}}
+    .rh-tag{font-family:'Space Mono',monospace;font-size:0.7rem;color:var(--muted);letter-spacing:0.12em;text-transform:uppercase;margin-bottom:12px;}
+    .rh-title{font-family:'Syne',sans-serif;font-weight:800;font-size:2.4rem;color:#fff;}
+    .rh-title span{color:var(--orange);}
+
+    /* INPUT DISPLAY */
+    .input-display{padding:24px 28px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.05);border-radius:4px;margin-bottom:32px;position:relative;overflow:hidden;animation:reveal 0.5s 0.1s ease both;}
+    .input-display::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--orange),transparent);}
+    .id-label{font-family:'Space Mono',monospace;font-size:0.68rem;color:var(--orange);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:10px;opacity:0.8;}
+    .id-text{font-family:'Space Mono',monospace;font-size:0.88rem;color:#c0c8d8;line-height:1.8;}
+
+    /* METRICS GRID — 4 cols for fake news */
+    .metrics-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:2px;margin-bottom:32px;animation:reveal 0.5s 0.2s ease both;}
+    .metric-block{padding:32px 20px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.04);text-align:center;position:relative;overflow:hidden;transition:all 0.3s;}
+    .metric-block:hover{background:rgba(255,159,60,0.04);border-color:rgba(255,159,60,0.15);}
+    .metric-block::after{content:'';position:absolute;bottom:0;left:50%;transform:translateX(-50%) scaleX(0);width:60%;height:2px;background:var(--orange);transition:transform 0.3s;}
+    .metric-block:hover::after{transform:translateX(-50%) scaleX(1);}
+    .mb-label{font-family:'Space Mono',monospace;font-size:0.62rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:16px;}
+    .mb-val{font-family:'Syne',sans-serif;font-weight:800;font-size:1.6rem;color:var(--orange);word-break:break-word;}
+    .metric-block:nth-child(2) .mb-val{color:var(--acid);}
+    .metric-block:nth-child(3) .mb-val{color:var(--plasma);}
+    .metric-block:nth-child(4) .mb-val{color:var(--cyan);}
+
+    /* EXPLANATION */
+    .explanation{padding:32px;background:rgba(8,5,16,0.8);border:1px solid var(--border);border-radius:4px;position:relative;overflow:hidden;animation:reveal 0.5s 0.3s ease both;}
+    .explanation::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--orange),transparent);}
+    .exp-label{font-family:'Space Mono',monospace;font-size:0.7rem;color:var(--orange);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:16px;display:flex;align-items:center;gap:8px;}
+    .exp-label::before{content:'›';}
+    #fakeExplanation{font-family:'Space Mono',monospace;font-size:0.85rem;color:#c0c8d8;line-height:1.9;}
+
+    /* BACK LINK */
+    .back-link{display:inline-flex;align-items:center;gap:8px;font-family:'Space Mono',monospace;font-size:0.72rem;color:var(--muted);text-decoration:none;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:32px;transition:color 0.2s;}
+    .back-link:hover{color:var(--orange);}
+
+    footer{padding:40px 60px;border-top:1px solid rgba(184,255,60,0.1);position:relative;z-index:1;display:flex;align-items:center;justify-content:space-between;}
+    .footer-logo{font-family:'Syne',sans-serif;font-weight:800;font-size:1.1rem;color:var(--acid);}
+    .footer-text{font-family:'Space Mono',monospace;font-size:0.7rem;color:var(--muted);}
+
+    @media(max-width:900px){nav{padding:0 20px;}.main{padding:90px 20px 40px;}.metrics-grid{grid-template-columns:repeat(2,1fr);}.nav-links a{font-size:0.65rem;padding:6px 8px;}footer{flex-direction:column;gap:10px;text-align:center;padding:24px;}}
+  </style>
+</head>
+<body onload="checkUserAccess(); loadFakeNewsResultPage();">
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+<div class="grid-bg"></div>
+<div class="orb orb-1"></div>
+<div class="orb orb-2"></div>
+
+<header>
+  <nav>
+    <a href="dashboard.html" class="nav-logo">TrustLens</a>
+    <ul class="nav-links">
+      <li><a href="dashboard.html">Dashboard</a></li>
+      <li><a href="analyze.html">Sentiment</a></li>
+      <li><a href="fake-news.html">Fake News</a></li>
+      <li><a href="login.html" onclick="logoutUser()">Logout</a></li>
+    </ul>
+  </nav>
+</header>
+
+<main class="main">
+  <a href="fake-news.html" class="back-link">← Back to Detection</a>
+
+  <div class="report-header">
+    <div class="rh-tag">// Fake News Analysis Report</div>
+    <h1 class="rh-title"><span>Credibility</span> Verdict</h1>
+  </div>
+
+  <div class="input-display">
+    <div class="id-label">&gt; News Input Stream</div>
+    <div class="id-text" id="fakeNewsDisplay">No news entered.</div>
+  </div>
+
+  <div class="metrics-grid">
+    <div class="metric-block">
+      <div class="mb-label">Prediction</div>
+      <div class="mb-val" id="fakePredictionResult">N/A</div>
+    </div>
+    <div class="metric-block">
+      <div class="mb-label">Confidence</div>
+      <div class="mb-val" id="fakeConfidence">0%</div>
+    </div>
+    <div class="metric-block">
+      <div class="mb-label">Misleading Score</div>
+      <div class="mb-val" id="fakeMisleading">0%</div>
+    </div>
+    <div class="metric-block">
+      <div class="mb-label">Trust Score</div>
+      <div class="mb-val" id="fakeTrust">0%</div>
+    </div>
+  </div>
+
+  <div class="explanation">
+    <div class="exp-label">System Explanation</div>
+    <p id="fakeExplanation">No explanation available.</p>
+  </div>
+</main>
+
+<footer>
+  <div class="footer-logo">TrustLens</div>
+  <div class="footer-text">© 2026 TrustLens — Neural Review Intelligence</div>
+</footer>
+
+<script src="js/script.js"></script>
+<script src="js/theme.js"></script>
+<script>
+  const cursor=document.getElementById('cursor'),ring=document.getElementById('cursorRing');
+  document.addEventListener('mousemove',e=>{cursor.style.left=e.clientX+'px';cursor.style.top=e.clientY+'px';ring.style.left=e.clientX+'px';ring.style.top=e.clientY+'px';});
+  document.querySelectorAll('a,button').forEach(el=>{
+    el.addEventListener('mouseenter',()=>{ring.style.transform='translate(-50%,-50%) scale(1.8)';ring.style.borderColor='rgba(255,159,60,0.8)';});
+    el.addEventListener('mouseleave',()=>{ring.style.transform='translate(-50%,-50%) scale(1)';ring.style.borderColor='rgba(255,159,60,0.5)';});
+  });
+</script>
+</body>
+</html>

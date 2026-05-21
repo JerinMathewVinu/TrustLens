@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>About — TrustLens</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    :root{--acid:#b8ff3c;--plasma:#ff3cac;--cyan:#3cffd8;--void:#03000a;--border:rgba(184,255,60,0.12);--text:#e8e8f0;--muted:#6b6b80;}
+    *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+    body{background:var(--void);color:var(--text);font-family:'DM Sans',sans-serif;min-height:100vh;overflow-x:hidden;cursor:none;}
+    .cursor{position:fixed;width:8px;height:8px;background:var(--acid);border-radius:50%;pointer-events:none;z-index:9999;transition:transform 0.1s;transform:translate(-50%,-50%);}
+    .cursor-ring{position:fixed;width:32px;height:32px;border:1px solid rgba(184,255,60,0.5);border-radius:50%;pointer-events:none;z-index:9998;transition:all 0.15s ease;transform:translate(-50%,-50%);}
+    .grid-bg{position:fixed;inset:0;z-index:0;pointer-events:none;background-image:linear-gradient(rgba(184,255,60,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(184,255,60,0.03) 1px,transparent 1px);background-size:60px 60px;}
+    .orb{position:fixed;border-radius:50%;filter:blur(140px);pointer-events:none;z-index:0;animation:drift 22s ease-in-out infinite;}
+    .orb-1{width:600px;height:600px;background:rgba(184,255,60,0.05);top:-200px;left:-150px;}
+    .orb-2{width:500px;height:500px;background:rgba(255,60,172,0.05);bottom:-200px;right:-100px;animation-delay:-11s;}
+    @keyframes drift{0%,100%{transform:translate(0,0);}50%{transform:translate(25px,-20px);}}
+
+    nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:0 60px;height:72px;background:rgba(3,0,10,0.75);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);}
+    .nav-logo{font-family:'Syne',sans-serif;font-weight:800;font-size:1.4rem;color:var(--acid);text-decoration:none;display:flex;align-items:center;gap:10px;}
+    .nav-logo::before{content:'';width:10px;height:10px;background:var(--acid);border-radius:50%;box-shadow:0 0 20px rgba(184,255,60,0.7);display:block;animation:pulse 2s infinite;}
+    @keyframes pulse{0%,100%{transform:scale(1);}50%{transform:scale(1.5);opacity:0.6;}}
+    .nav-links{list-style:none;display:flex;gap:8px;}
+    .nav-links a{font-family:'Space Mono',monospace;font-size:0.75rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--muted);text-decoration:none;padding:8px 16px;border-radius:4px;transition:all 0.2s;}
+    .nav-links a:hover,.nav-links a.active{color:var(--acid);background:rgba(184,255,60,0.08);}
+
+    .main{padding:120px 60px 80px;position:relative;z-index:1;max-width:1200px;margin:auto;}
+
+    /* HERO */
+    .about-hero{display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center;margin-bottom:100px;}
+    .ah-tag{font-family:'Space Mono',monospace;font-size:0.7rem;color:var(--muted);letter-spacing:0.12em;text-transform:uppercase;margin-bottom:14px;}
+    .ah-title{font-family:'Syne',sans-serif;font-weight:800;font-size:3.2rem;color:#fff;line-height:1.1;margin-bottom:20px;}
+    .ah-title span{color:var(--acid);}
+    .ah-desc{color:var(--muted);font-size:1rem;line-height:1.9;}
+    .ah-visual{position:relative;}
+    .about-box{padding:32px;background:rgba(8,5,16,0.9);border:1px solid var(--border);border-radius:4px;position:relative;overflow:hidden;}
+    .about-box::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--acid),transparent);}
+    .abox-row{display:flex;gap:16px;padding:16px 0;border-bottom:1px solid rgba(255,255,255,0.04);}
+    .abox-row:last-child{border-bottom:none;}
+    .abox-key{font-family:'Space Mono',monospace;font-size:0.72rem;color:var(--acid);opacity:0.7;width:130px;flex-shrink:0;}
+    .abox-val{font-family:'Space Mono',monospace;font-size:0.78rem;color:#c0c8d8;}
+
+    /* SECTION */
+    .section-label{font-family:'Space Mono',monospace;font-size:0.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.12em;margin-bottom:32px;display:flex;align-items:center;gap:10px;}
+    .section-label::before{content:'';height:1px;width:30px;background:var(--acid);opacity:0.5;}
+
+    /* FEATURES */
+    .features-list{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;margin-bottom:80px;}
+    .fl-item{padding:40px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.04);position:relative;overflow:hidden;transition:all 0.3s;}
+    .fl-item:hover{background:rgba(184,255,60,0.03);border-color:rgba(184,255,60,0.12);}
+    .fl-item::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--acid),transparent);transform:scaleX(0);transition:transform 0.4s;}
+    .fl-item:hover::before{transform:scaleX(1);}
+    .fl-num{font-family:'Space Mono',monospace;font-size:0.65rem;color:var(--acid);opacity:0.4;margin-bottom:18px;}
+    .fl-title{font-family:'Syne',sans-serif;font-weight:700;font-size:1.05rem;color:#fff;margin-bottom:10px;}
+    .fl-desc{font-size:0.88rem;color:var(--muted);line-height:1.7;}
+
+    /* STATS */
+    .stats-row{display:grid;grid-template-columns:repeat(3,1fr);border:1px solid var(--border);}
+    .sr-item{padding:48px;text-align:center;border-right:1px solid var(--border);position:relative;overflow:hidden;transition:all 0.3s;}
+    .sr-item:last-child{border-right:none;}
+    .sr-item:hover{background:rgba(184,255,60,0.03);}
+    .sr-num{font-family:'Syne',sans-serif;font-weight:800;font-size:3.2rem;color:var(--acid);text-shadow:0 0 20px rgba(184,255,60,0.3);display:block;margin-bottom:8px;}
+    .sr-label{font-family:'Space Mono',monospace;font-size:0.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.1em;}
+
+    footer{padding:40px 60px;border-top:1px solid var(--border);position:relative;z-index:1;display:flex;align-items:center;justify-content:space-between;}
+    .footer-logo{font-family:'Syne',sans-serif;font-weight:800;font-size:1.1rem;color:var(--acid);}
+    .footer-text{font-family:'Space Mono',monospace;font-size:0.7rem;color:var(--muted);}
+
+    @media(max-width:900px){nav{padding:0 20px;}.main{padding:90px 20px 40px;}.about-hero{grid-template-columns:1fr;gap:40px;}.features-list{grid-template-columns:1fr;}.stats-row{grid-template-columns:1fr;}.sr-item{border-right:none;border-bottom:1px solid var(--border);}.ah-title{font-size:2.2rem;}.nav-links a{font-size:0.65rem;padding:6px 8px;}footer{flex-direction:column;gap:10px;text-align:center;padding:24px;}}
+  </style>
+</head>
+<body>
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+<div class="grid-bg"></div>
+<div class="orb orb-1"></div>
+<div class="orb orb-2"></div>
+
+<header>
+  <nav>
+    <a href="index.html" class="nav-logo">TrustLens</a>
+    <ul class="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="about.html" class="active">About</a></li>
+      <li><a href="contact.html">Contact</a></li>
+      <li><a href="login.html">Login</a></li>
+      <li><a href="register.html">Register</a></li>
+    </ul>
+  </nav>
+</header>
+
+<main class="main">
+  <div class="about-hero">
+    <div>
+      <div class="ah-tag">// System Intelligence</div>
+      <h1 class="ah-title">What Is <span>TrustLens</span>?</h1>
+      <p class="ah-desc">TrustLens is an intelligent review analysis system engineered to identify sentiment, detect misleading feedback, and compute a trustworthiness score using AI-inspired methodologies. Built for a world where fake reviews cost decisions.</p>
+    </div>
+    <div class="ah-visual">
+      <div class="about-box">
+        <div class="abox-row"><span class="abox-key">VERSION</span><span class="abox-val">TrustLens v2.0</span></div>
+        <div class="abox-row"><span class="abox-key">ENGINE</span><span class="abox-val">Neural Sentiment AI</span></div>
+        <div class="abox-row"><span class="abox-key">ACCURACY</span><span class="abox-val">95% Detection Rate</span></div>
+        <div class="abox-row"><span class="abox-key">STATUS</span><span class="abox-val" style="color:#28c840;">● ONLINE</span></div>
+        <div class="abox-row"><span class="abox-key">BUILD</span><span class="abox-val">Java / 2026</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-label">Core Capabilities</div>
+  <div class="features-list">
+    <div class="fl-item">
+      <div class="fl-num">01 //</div>
+      <div class="fl-title">Mission Objective</div>
+      <p class="fl-desc">Help users and businesses determine whether online reviews are genuine, suspicious, positive, negative, or neutral — at a glance.</p>
+    </div>
+    <div class="fl-item">
+      <div class="fl-num">02 //</div>
+      <div class="fl-title">Smart Analysis Engine</div>
+      <p class="fl-desc">Intelligent logic processes review text to classify emotional tone, detect manipulation patterns, and calculate trust reliability.</p>
+    </div>
+    <div class="fl-item">
+      <div class="fl-num">03 //</div>
+      <div class="fl-title">Radical Transparency</div>
+      <p class="fl-desc">Improves trust in digital platforms by exposing misleading, exaggerated, or artificially generated review content.</p>
+    </div>
+  </div>
+
+  <div class="section-label">By The Numbers</div>
+  <div class="stats-row">
+    <div class="sr-item"><span class="sr-num">AI</span><span class="sr-label">Inspired Review Intelligence</span></div>
+    <div class="sr-item"><span class="sr-num">Fast</span><span class="sr-label">Instant Review Processing</span></div>
+    <div class="sr-item"><span class="sr-num">Secure</span><span class="sr-label">Reliable Output System</span></div>
+  </div>
+</main>
+
+<footer>
+  <div class="footer-logo">TrustLens</div>
+  <div class="footer-text">© 2026 TrustLens — Neural Review Intelligence</div>
+</footer>
+
+<script src="js/script.js"></script>
+<script src="js/theme.js"></script>
+<script>
+  const cursor=document.getElementById('cursor'),ring=document.getElementById('cursorRing');
+  document.addEventListener('mousemove',e=>{cursor.style.left=e.clientX+'px';cursor.style.top=e.clientY+'px';ring.style.left=e.clientX+'px';ring.style.top=e.clientY+'px';});
+  document.querySelectorAll('a,button').forEach(el=>{el.addEventListener('mouseenter',()=>{ring.style.transform='translate(-50%,-50%) scale(1.8)';});el.addEventListener('mouseleave',()=>{ring.style.transform='translate(-50%,-50%) scale(1)';});});
+</script>
+</body>
+</html>

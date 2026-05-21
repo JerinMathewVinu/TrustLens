@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard — TrustLens</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    :root{--acid:#b8ff3c;--plasma:#ff3cac;--cyan:#3cffd8;--orange:#ff9f3c;--void:#03000a;--surface:rgba(255,255,255,0.03);--border:rgba(184,255,60,0.1);--text:#e8e8f0;--muted:#6b6b80;}
+    *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+    body{background:var(--void);color:var(--text);font-family:'DM Sans',sans-serif;min-height:100vh;overflow-x:hidden;cursor:none;}
+    .cursor{position:fixed;width:8px;height:8px;background:var(--acid);border-radius:50%;pointer-events:none;z-index:9999;transition:transform 0.1s;transform:translate(-50%,-50%);}
+    .cursor-ring{position:fixed;width:32px;height:32px;border:1px solid rgba(184,255,60,0.5);border-radius:50%;pointer-events:none;z-index:9998;transition:all 0.15s ease;transform:translate(-50%,-50%);}
+    body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;opacity:0.3;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(184,255,60,0.01) 2px,rgba(184,255,60,0.01) 4px);}
+    .grid-bg{position:fixed;inset:0;z-index:0;pointer-events:none;background-image:linear-gradient(rgba(184,255,60,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(184,255,60,0.03) 1px,transparent 1px);background-size:60px 60px;}
+    .orb{position:fixed;border-radius:50%;filter:blur(140px);pointer-events:none;z-index:0;animation:drift 25s ease-in-out infinite;}
+    .orb-1{width:600px;height:600px;background:rgba(184,255,60,0.05);top:-200px;left:-100px;}
+    .orb-2{width:500px;height:500px;background:rgba(60,255,216,0.04);bottom:-200px;right:-100px;animation-delay:-12s;}
+    @keyframes drift{0%,100%{transform:translate(0,0);}50%{transform:translate(20px,-15px);}}
+
+    nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:0 60px;height:72px;background:rgba(3,0,10,0.75);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);}
+    .nav-logo{font-family:'Syne',sans-serif;font-weight:800;font-size:1.4rem;color:var(--acid);text-decoration:none;display:flex;align-items:center;gap:10px;}
+    .nav-logo::before{content:'';width:10px;height:10px;background:var(--acid);border-radius:50%;box-shadow:0 0 20px rgba(184,255,60,0.7);display:block;animation:pulse 2s infinite;}
+    @keyframes pulse{0%,100%{transform:scale(1);}50%{transform:scale(1.5);opacity:0.6;}}
+    .nav-links{list-style:none;display:flex;gap:8px;}
+    .nav-links a{font-family:'Space Mono',monospace;font-size:0.75rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--muted);text-decoration:none;padding:8px 16px;border-radius:4px;transition:all 0.2s;}
+    .nav-links a:hover,.nav-links a.active{color:var(--acid);background:rgba(184,255,60,0.08);}
+
+    .main{padding:100px 60px 60px;position:relative;z-index:1;max-width:1400px;margin:auto;}
+
+    .welcome-strip{display:flex;align-items:center;justify-content:space-between;padding:32px 40px;background:rgba(184,255,60,0.04);border:1px solid rgba(184,255,60,0.12);border-radius:4px;margin-bottom:48px;position:relative;overflow:hidden;}
+    .welcome-strip::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--acid),transparent);}
+    .welcome-id{font-family:'Space Mono',monospace;font-size:0.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:8px;}
+    .welcome-name{font-family:'Syne',sans-serif;font-weight:800;font-size:1.8rem;color:#fff;}
+    .welcome-name span{color:var(--acid);}
+    .welcome-status{display:flex;align-items:center;gap:10px;font-family:'Space Mono',monospace;font-size:0.78rem;color:var(--muted);}
+    .status-dot{width:8px;height:8px;background:#28c840;border-radius:50%;box-shadow:0 0 10px #28c840;animation:pulse 2s infinite;}
+
+    .section-label{font-family:'Space Mono',monospace;font-size:0.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.12em;margin-bottom:20px;display:flex;align-items:center;gap:10px;}
+    .section-label::before{content:'';height:1px;width:30px;background:var(--acid);opacity:0.5;}
+
+    .metrics-row{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;margin-bottom:48px;}
+    .metric{padding:36px 32px;background:var(--surface);border:1px solid rgba(255,255,255,0.04);position:relative;overflow:hidden;transition:all 0.3s;}
+    .metric:hover{background:rgba(184,255,60,0.04);border-color:rgba(184,255,60,0.12);}
+    .metric::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;background:var(--acid);transform:scaleX(0);transform-origin:left;transition:transform 0.4s;}
+    .metric:hover::after{transform:scaleX(1);}
+    .metric-label{font-family:'Space Mono',monospace;font-size:0.68rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.12em;margin-bottom:16px;}
+    .metric-val{font-family:'Syne',sans-serif;font-weight:800;font-size:3rem;color:var(--acid);text-shadow:0 0 20px rgba(184,255,60,0.3);}
+    .metric:nth-child(2) .metric-val{color:var(--cyan);text-shadow:0 0 20px rgba(60,255,216,0.3);}
+    .metric:nth-child(3) .metric-val{color:var(--plasma);text-shadow:0 0 20px rgba(255,60,172,0.3);}
+
+    /* TWO BIG MODULES */
+    .modules-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:48px;}
+    .module-card{padding:40px;background:rgba(8,5,16,0.85);border:1px solid rgba(255,255,255,0.05);border-radius:4px;transition:all 0.35s;position:relative;overflow:hidden;display:flex;flex-direction:column;}
+    .module-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;transform:scaleX(0);transform-origin:left;transition:transform 0.4s;}
+    .module-card.mod-sentiment::before{background:var(--acid);}
+    .module-card.mod-fakenews::before{background:var(--orange);}
+    .module-card:hover::before{transform:scaleX(1);}
+    .module-card.mod-sentiment:hover{border-color:rgba(184,255,60,0.15);transform:translateY(-4px);box-shadow:0 24px 60px rgba(0,0,0,0.5);}
+    .module-card.mod-fakenews:hover{border-color:rgba(255,159,60,0.15);transform:translateY(-4px);box-shadow:0 24px 60px rgba(0,0,0,0.5);}
+    .mc-tag{font-family:'Space Mono',monospace;font-size:0.65rem;color:var(--muted);margin-bottom:20px;}
+    .mc-icon{font-size:3rem;margin-bottom:18px;display:block;}
+    .mc-title{font-family:'Syne',sans-serif;font-weight:800;font-size:1.5rem;color:#fff;margin-bottom:12px;}
+    .mc-desc{font-size:0.9rem;color:var(--muted);line-height:1.8;margin-bottom:36px;flex:1;}
+    .mc-link{display:inline-flex;align-items:center;gap:10px;font-family:'Syne',sans-serif;font-weight:700;font-size:0.85rem;letter-spacing:0.06em;text-transform:uppercase;padding:14px 26px;border-radius:4px;text-decoration:none;border:none;cursor:pointer;transition:all 0.25s;align-self:flex-start;position:relative;overflow:hidden;}
+    .mc-link::before{content:'';position:absolute;top:0;left:-100%;width:100%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.2),transparent);transition:left 0.5s;}
+    .mc-link:hover::before{left:100%;}
+    .mod-sentiment .mc-link{color:var(--void);background:var(--acid);}
+    .mod-sentiment .mc-link:hover{box-shadow:0 0 28px rgba(184,255,60,0.5);}
+    .mod-fakenews .mc-link{color:var(--void);background:var(--orange);}
+    .mod-fakenews .mc-link:hover{box-shadow:0 0 28px rgba(255,159,60,0.5);}
+
+    /* QUICK ACTIONS */
+    .actions-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;}
+    .action-card{padding:32px;background:rgba(8,5,16,0.7);border:1px solid rgba(255,255,255,0.04);border-radius:4px;transition:all 0.3s;position:relative;overflow:hidden;}
+    .action-card::before{content:'';position:absolute;top:0;left:0;width:2px;height:100%;transform:scaleY(0);transform-origin:top;transition:transform 0.3s;}
+    .action-card:nth-child(1)::before{background:var(--acid);}
+    .action-card:nth-child(2)::before{background:var(--orange);}
+    .action-card:nth-child(3)::before{background:var(--plasma);}
+    .action-card:hover::before{transform:scaleY(1);}
+    .action-card:hover{transform:translateY(-3px);box-shadow:0 16px 40px rgba(0,0,0,0.4);}
+    .ac-num{font-family:'Space Mono',monospace;font-size:0.65rem;color:var(--muted);margin-bottom:16px;}
+    .ac-icon{font-size:1.8rem;margin-bottom:14px;display:block;}
+    .ac-title{font-family:'Syne',sans-serif;font-weight:700;font-size:1rem;color:#fff;margin-bottom:8px;}
+    .ac-desc{font-size:0.85rem;color:var(--muted);line-height:1.7;margin-bottom:20px;}
+    .ac-link{font-family:'Space Mono',monospace;font-size:0.72rem;text-decoration:none;text-transform:uppercase;letter-spacing:0.08em;display:inline-flex;align-items:center;gap:6px;transition:gap 0.2s;}
+    .ac-link:hover{gap:12px;}
+    .action-card:nth-child(1) .ac-link{color:var(--acid);}
+    .action-card:nth-child(2) .ac-link{color:var(--orange);}
+    .action-card:nth-child(3) .ac-link{color:var(--plasma);}
+
+    footer{padding:40px 60px;border-top:1px solid var(--border);position:relative;z-index:1;display:flex;align-items:center;justify-content:space-between;}
+    .footer-logo{font-family:'Syne',sans-serif;font-weight:800;font-size:1.1rem;color:var(--acid);}
+    .footer-text{font-family:'Space Mono',monospace;font-size:0.7rem;color:var(--muted);}
+
+    @media(max-width:1100px){.modules-grid{grid-template-columns:1fr;}}
+    @media(max-width:900px){nav{padding:0 20px;}.main{padding:90px 20px 40px;}.metrics-row,.actions-grid{grid-template-columns:1fr;}.welcome-strip{flex-direction:column;gap:20px;text-align:center;}.nav-links a{font-size:0.65rem;padding:6px 8px;}footer{flex-direction:column;gap:10px;text-align:center;padding:24px;}}
+  </style>
+</head>
+<body onload="checkUserAccess(); loadDashboard();">
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+<div class="grid-bg"></div>
+<div class="orb orb-1"></div>
+<div class="orb orb-2"></div>
+
+<header>
+  <nav>
+    <a href="dashboard.html" class="nav-logo">TrustLens</a>
+    <ul class="nav-links">
+      <li><a href="dashboard.html">Dashboard</a></li>
+      <li><a href="analyze.html">Sentiment</a></li>
+      <li><a href="fake-news.html">Fake News</a></li>
+      <li><a href="login.html" onclick="logoutUser()">Logout</a></li>
+    </ul>
+  </nav>
+</header>
+
+<main class="main">
+  <div class="welcome-strip">
+    <div>
+      <div class="welcome-id">// User Session Active</div>
+      <div class="welcome-name"><span id="welcomeUser">Welcome Back</span></div>
+    </div>
+    <div class="welcome-status"><div class="status-dot"></div>Neural Engine Online</div>
+  </div>
+
+  <div class="section-label">System Metrics</div>
+  <div class="metrics-row">
+    <div class="metric"><div class="metric-label">Sentiment Reviews</div><div class="metric-val" id="reviewCount">0</div></div>
+    <div class="metric"><div class="metric-label">Fake News Checked</div><div class="metric-val" id="fakeNewsCount">0</div></div>
+    <div class="metric"><div class="metric-label">Suspicious Alerts</div><div class="metric-val" id="suspiciousCount">0</div></div>
+  </div>
+
+  <div class="section-label">Analysis Modules</div>
+  <div class="modules-grid">
+    <div class="module-card mod-sentiment">
+      <div class="mc-tag">01 // Sentiment Intelligence</div>
+      <span class="mc-icon">🧠</span>
+      <div class="mc-title">Sentiment Analysis</div>
+      <p class="mc-desc">Analyze reviews, comments, and feedback to detect whether the text is Positive, Negative, or Neutral using AI-powered sentiment intelligence. Computes trust scores and misleading indicators.</p>
+      <a href="analyze.html" class="mc-link">Open Module →</a>
+    </div>
+    <div class="module-card mod-fakenews">
+      <div class="mc-tag">02 // Misinformation Detection</div>
+      <span class="mc-icon">📰</span>
+      <div class="mc-title">Fake News Detection</div>
+      <p class="mc-desc">Detect whether a news headline or article is Real or Fabricated using a trained model built on verified misinformation datasets. Generates a full credibility report with trust scoring.</p>
+      <a href="fake-news.html" class="mc-link">Open Module →</a>
+    </div>
+  </div>
+
+  <div class="section-label">Quick Actions</div>
+  <div class="actions-grid">
+    <div class="action-card">
+      <div class="ac-num">// Sentiment Results</div>
+      <span class="ac-icon">📋</span>
+      <div class="ac-title">Last Sentiment Report</div>
+      <p class="ac-desc">Access your most recent review sentiment analysis and computed metrics.</p>
+      <a href="result.html" class="ac-link">View Report →</a>
+    </div>
+    <div class="action-card">
+      <div class="ac-num">// Fake News Results</div>
+      <span class="ac-icon">🔎</span>
+      <div class="ac-title">Last News Verdict</div>
+      <p class="ac-desc">See results from your most recent fake news detection analysis run.</p>
+      <a href="fake-news-result.html" class="ac-link">View Report →</a>
+    </div>
+    <div class="action-card">
+      <div class="ac-num">// System Info</div>
+      <span class="ac-icon">🛡️</span>
+      <div class="ac-title">System Intel</div>
+      <p class="ac-desc">Explore TrustLens capabilities, methodology and neural engine systems.</p>
+      <a href="about.html" class="ac-link">Explore →</a>
+    </div>
+  </div>
+</main>
+
+<footer>
+  <div class="footer-logo">TrustLens</div>
+  <div class="footer-text">© 2026 TrustLens — Neural Review Intelligence</div>
+</footer>
+
+<script src="js/script.js"></script>
+<script src="js/theme.js"></script>
+<script>
+  const cursor=document.getElementById('cursor'),ring=document.getElementById('cursorRing');
+  document.addEventListener('mousemove',e=>{cursor.style.left=e.clientX+'px';cursor.style.top=e.clientY+'px';ring.style.left=e.clientX+'px';ring.style.top=e.clientY+'px';});
+  document.querySelectorAll('a,button').forEach(el=>{el.addEventListener('mouseenter',()=>{ring.style.transform='translate(-50%,-50%) scale(1.8)';});el.addEventListener('mouseleave',()=>{ring.style.transform='translate(-50%,-50%) scale(1)';});});
+</script>
+</body>
+</html>
